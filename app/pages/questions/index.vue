@@ -28,14 +28,14 @@ const fetchQuestions = async () => {
       // Gunakan ID langsung dari computed babIdFromQuery
       const bab_id = babIdFromQuery.value;
 
-      res = await $fetch<IQuestion[]>(`http://localhost:5002/api/v1/bab/questions/admin/${bab_id}`, {
+      res = await $fetch<IQuestion[]>(`${Base_url}/bab/questions/admin/${bab_id}`, {
         method: 'GET'
       });
 
     
     } else {
       // Fetch semua pertanyaan
-      res = await $fetch<IQuestion[]>('http://localhost:5002/api/v1/questions/all', {
+      res = await $fetch<IQuestion[]>(`${Base_url}/questions/all`, {
         method: 'GET'
       });
     }
@@ -127,6 +127,7 @@ const viewAll = () => {
 
     <CreateQuestions 
       v-if="showAdd"
+      :bab="{}"
       :show="showAdd" 
       :initial-bab-id="babIdFromQuery"
       @close="showAdd = false" 

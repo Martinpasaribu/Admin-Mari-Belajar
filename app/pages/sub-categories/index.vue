@@ -31,7 +31,7 @@ const fetchSubCategories = async () => {
 
     if (CatId) {
       // Endpoint: Get by Category ID
-      res = await $fetch<any>(`http://localhost:5002/api/v1/sub-categories/category/${CatId}`, {
+      res = await $fetch<any>(`${Base_url}/sub-categories/category/${CatId}`, {
         method: 'GET'
       });
     } else {

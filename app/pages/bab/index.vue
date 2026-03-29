@@ -32,7 +32,7 @@ const fetchBab = async () => {
 
     if (subCatId) {
       // Endpoint: Get Bab by SubCategory ID
-      res = await $fetch<any>(`http://localhost:5002/api/v1/bab/${subCatId}/sub_category`, {
+      res = await $fetch<any>(`${Base_url}/bab/${subCatId}/sub_category`, {
         method: 'GET'
       });
     } else {

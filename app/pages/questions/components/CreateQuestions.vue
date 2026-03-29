@@ -11,7 +11,7 @@ import AudioPicker from '~/components/shared/AudioPicker.vue';
 
 const props = defineProps<{
    show: boolean
-   bab: IBab | null,
+   bab: IBab | null | {},
 }>()
 
 const emit = defineEmits(['close', 'success'])
@@ -40,7 +40,7 @@ const form = ref<any>({
 // Reset form saat modal dibuka
 watch(() => props.show, (newVal) => {
   if (newVal) {
-    form.value.bab_key = props.bab?._id
+    form.value.bab_key = props.bab?._id ? props.bab?._id : ""
     // Reset options jika perlu
   }
 })

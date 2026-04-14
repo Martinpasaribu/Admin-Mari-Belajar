@@ -88,12 +88,21 @@
           
           <div>
             <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">Teks Pembahasan</label>
-            <textarea v-model="form.discussion_text" rows="5" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none"></textarea>
+            <!-- <textarea v-model="form.discussion_text" rows="5" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none"></textarea> -->
+            <ClientOnly>
+              <RichEditor v-model="form.discussion_text" />
+              <template #fallback>
+                <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                  <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                </div>
+              </template>
+            </ClientOnly>
           </div>
 
           <div>
             <label class="block text-xs font-bold text-slate-500 mb-2 uppercase">URL Video Pembahasan</label>
-            <input v-model="form.discussion_video.url" type="text" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none" />
+            <!-- <input v-model="form.discussion_video.url" type="text" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none" /> -->
+              <VideoPicker v-model="form.discussion_video" label="Pilih Video Pembahasan" />
           </div>
 
           <hr />
@@ -116,6 +125,9 @@
 
 <script setup lang="ts">
 import type { IQuestion } from '~/types/questions';
+import RichEditor from '~/components/shared/RichEditor.vue';
+import VideoPicker from '~/components/shared/VideoPicker.vue';
+
 
 definePageMeta({ layout: 'admin' });
 
@@ -137,7 +149,7 @@ const form = ref<any>({
   ],
   correct_answer: '',
   discussion_text: '',
-  discussion_video: { url: '' },
+  discussion_video: null,
   isActive: true
 });
 
@@ -155,13 +167,72 @@ watchEffect(() => {
   }
 });
 
+const performUpload = async (file: any, endpoint: 'upload-single' | 'upload-multiple') => {
+  // 1. Cek apakah file ada
+  if (!file) return null;
+
+  // 2. LOGIKA KRUSIAL: Cek apakah ini File asli atau hanya data URL lama
+  // Jika file adalah instance dari File (hasil input file), maka upload.
+  // Jika bukan (misal objek dari database), kembalikan datanya langsung tanpa upload.
+  const isFile = file instanceof File;
+  const isMultipleFiles = Array.isArray(file) && file[0] instanceof File;
+
+  if (!isFile && !isMultipleFiles) {
+    return file; // Langsung kembalikan data lama (URL/Objek)
+  }
+
+  const formData = new FormData();
+  if (Array.isArray(file)) {
+    file.forEach(f => formData.append('files', f));
+  } else {
+    formData.append('file', file);
+  }
+  
+  const res = await $fetch<any>(`/api/media/${endpoint}`, { 
+    method: 'POST', 
+    body: formData 
+  });
+  
+  return res.data || res;
+}
+
 // 3. Fungsi Update ke Backend
 const handleUpdate = async () => {
   isUpdating.value = true;
   try {
+        
+    // 1. Upload Multimedia Soal
+    const [audio, video] = await Promise.all([
+      performUpload(form.value.question_audio, 'upload-single'),
+      performUpload(form.value.discussion_video, 'upload-single')
+    ])
+
+    const images = form.value.question_images.length 
+      ? await performUpload(form.value.question_images, 'upload-multiple') 
+      : []
+
+          // 2. Upload Gambar Pilihan Jawaban (Jika tipe image_options)
+    const processedOptions = await Promise.all(form.value.options.map(async (opt: any) => {
+      if (form.value.type === 'image_options' && opt.image) {
+        const uploadedImg = await performUpload(opt.image, 'upload-single')
+        return { ...opt, image: uploadedImg }
+      }
+      return opt
+    }))
+
+    const cleanVideo = (video && video.url && video.fileId) ? video : null;
+
+    const payload = {
+      ...form.value,
+      question_audio: audio || null,
+      question_images: images || [],
+      discussion_video: cleanVideo, // Kirim null jika data tidak lengkap
+      options: form.value.type === 'essay' ? [] : processedOptions
+    }
+
     await $fetch(`http://localhost:5002/api/v1/questions/${questionId}`, {
       method: 'PUT',
-      body: form.value
+      body: payload
     });
     
     // Tampilkan notifikasi atau redirect

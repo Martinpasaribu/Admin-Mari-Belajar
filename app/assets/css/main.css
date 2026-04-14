@@ -1,1 +1,29 @@
+/* assets/css/main.css atau app.css */
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* ... theme kamu ... */
+}
+
+/* Custom CSS untuk Alignment Tiptap (WAJIB) */
+/* Karena Tiptap menggunakan class untuk alignment, kita harus mendefinisikannya manual */
+@layer base {
+  .prose .has-text-align-center {
+    text-align: center;
+  }
+  .prose .has-text-align-right {
+    text-align: right;
+  }
+  .prose .has-text-align-justify {
+    text-align: justify;
+  }
+  
+  /* Pastikan list tetap muncul */
+  .prose ul {
+    list-style-type: disc;
+  }
+  .prose ol {
+    list-style-type: decimal;
+  }
+}

@@ -4,6 +4,8 @@ import ImageUpload from '~/components/shared/ImageUpload.vue';
 import VideoPicker from '~/components/shared/VideoPicker.vue';
 import DocumentPicker from '~/components/shared/DocumentPicker.vue';
 import type { ISubCategory } from '~/types/sub-categories';
+import RichEditor from '~/components/shared/RichEditor.vue';
+
 
 const props = defineProps<{
   show: boolean
@@ -23,9 +25,9 @@ const form = ref<any>({
   content: '',
   sub_category_key: null, // Field ini harus sinkron
   order: 0,
+  duration: 0,
   isActive: true,
   isFree: true,
-  price: 0,
   icon: null,
   image_bg: null,
   images: [],
@@ -116,7 +118,6 @@ const handleUpdate = async () => {
 
     const finalPayload = {
       ...rawData,
-      price: Number(rawData.price) || 0,
       order: Number(rawData.order) || 0,
       sub_category_key: form.value.sub_category_key, // Memastikan key ini terkirim
       icon,
@@ -202,17 +203,68 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
 
         <div>
           <label :class="labelClass">Isi Materi (Content)</label>
-          <textarea v-model="form.content" rows="6" :class="inputClass"></textarea>
+          <!-- <textarea v-model="form.content" rows="6" :class="inputClass"></textarea> -->
+                       
+          <ClientOnly>
+              <RichEditor v-model="form.content" />
+              <template #fallback>
+                <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                  <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                </div>
+              </template>
+            </ClientOnly>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label :class="labelClass">Ringkasan Deskripsi</label>
-            <textarea v-model="form.description" rows="3" :class="inputClass"></textarea>
+            <label :class="labelClass">Main Description</label>
+            <!-- <textarea v-model="form.description" rows="3" :class="inputClass"></textarea> -->
+                         
+            <ClientOnly>
+              <RichEditor v-model="form.description" />
+              <template #fallback>
+                <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                  <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                </div>
+              </template>
+            </ClientOnly>
           </div>
           <div>
-            <label :class="labelClass">Info Tambahan</label>
-            <textarea v-model="form.sub_description" rows="3" :class="inputClass"></textarea>
+            <label :class="labelClass">Sub Description</label>
+            <!-- <textarea v-model="form.sub_description" rows="3" :class="inputClass"></textarea> -->
+                           
+            <ClientOnly>
+                <RichEditor v-model="form.sub_description" />
+                <template #fallback>
+                  <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                    <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                  </div>
+                </template>
+              </ClientOnly>
+          </div>
+        </div>
+
+                    
+        <div class="group">
+          <div class="flex justify-between items-center mb-1.5">
+            <label :class="labelClass" class="mb-0">Durasi Pengerjaan</label>
+            <transition name="fade">
+              <span v-if="form.duration > 0" class="text-[10px] font-bold text-blue-500 bg-blue-50 px-2 py-0.5 rounded-md">
+                {{ (form.duration / 60).toFixed(1) }} Jam
+              </span>
+            </transition>
+          </div>
+          <div class="relative flex items-center">
+            <input 
+              v-model.number="form.duration" 
+              type="number" 
+              class="w-full bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-900 font-bold text-sm transition-all duration-300 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none placeholder:font-normal placeholder:text-slate-300 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              placeholder="0"
+            />
+            <div class="absolute right-4 flex items-center gap-2 pointer-events-none">
+              <span class="h-3 w-[1px] bg-slate-200 group-focus-within:bg-blue-200 transition-colors"></span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 group-focus-within:text-blue-500">Menit</span>
+            </div>
           </div>
         </div>
 

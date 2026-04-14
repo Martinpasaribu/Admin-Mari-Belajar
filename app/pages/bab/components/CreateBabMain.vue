@@ -4,6 +4,9 @@ import type { ISubCategory } from '~/types/sub-categories'
 import ImageUpload from '~/components/shared/ImageUpload.vue'
 import VideoPicker from '~/components/shared/VideoPicker.vue'
 import DocumentPicker from '~/components/shared/DocumentPicker.vue'
+import RichEditor from '~/components/shared/RichEditor.vue';
+
+
 
 type CreateBabForm = {
   name: string
@@ -216,14 +219,33 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label :class="labelClass">Deskripsi Ringkas</label>
-              <textarea v-model="form.description" rows="3" :class="inputClass" placeholder="Muncul pada list bab..."></textarea>
+              <label :class="labelClass">Main Description</label>
+              <!-- <textarea v-model="form.description" rows="3" :class="inputClass"></textarea> -->
+                          
+              <ClientOnly>
+                <RichEditor v-model="form.description" />
+                <template #fallback>
+                  <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                    <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                  </div>
+                </template>
+              </ClientOnly>
             </div>
             <div>
-              <label :class="labelClass">Info Tambahan</label>
-              <textarea v-model="form.sub_description" rows="3" :class="inputClass" placeholder="Catatan kecil..."></textarea>
+              <label :class="labelClass">Sub Description</label>
+              <!-- <textarea v-model="form.sub_description" rows="3" :class="inputClass"></textarea> -->
+                            
+              <ClientOnly>
+                  <RichEditor v-model="form.sub_description" />
+                  <template #fallback>
+                    <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                      <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                    </div>
+                  </template>
+                </ClientOnly>
             </div>
           </div>
+
         </div>
       </div>
 

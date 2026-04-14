@@ -7,9 +7,30 @@ const props = defineProps<{
   id: string;
   confirmLabel?: string;
   loading?: boolean;
+  size: string
 }>();
 
 const emit = defineEmits(['close', 'confirm']);
+
+// Memetakan props size ke class Tailwind
+const modalSizeClass = computed(() => {
+  switch (props.size) {
+    case 'xs': return 'max-w-xs';
+    case 'sm': return 'max-w-sm';
+    case 'md': return 'max-w-md';
+    case 'lg': return 'max-w-lg';
+    case 'xl': return 'max-w-xl';
+    case '2xl': return 'max-w-2xl';
+    case '3xl': return 'max-w-3xl';
+    case '4xl': return 'max-w-4xl';
+    case '5xl': return 'max-w-5xl';
+    case '6xl': return 'max-w-6xl';
+    case '7xl': return 'max-w-7xl';
+    case '8xl': return 'max-w-8xl';
+    case 'full': return 'max-w-[95vw]';
+    default: return 'max-w-2xl'; // Default jika tidak diisi
+  }
+});
 
 // Close on ESC key
 onMounted(() => {
@@ -32,7 +53,9 @@ onMounted(() => {
       <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" @click="emit('close')"></div>
 
-        <div class="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+        <div 
+          :class="['relative w-full bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col transition-all', modalSizeClass]"
+        >
           <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
             <div>
               <h3 class="text-lg font-bold text-slate-800">{{ title }}</h3>

@@ -24,7 +24,13 @@
             <span class="text-slate-400 capitalize">{{ question.type.replace('_', ' ') }}</span>
           </div>
 
-          <h2 class="text-xl text-slate-800 leading-relaxed mb-6">{{ question.question_text }}</h2>
+          <article 
+            class="prose prose-slate dark:prose-invert max-w-none 
+                  prose-headings:text-slate-800 dark:prose-headings:text-white
+                  prose-p:text-slate-900 dark:prose-p:text-slate-800
+                  prose-p:leading-relaxed"
+            v-html="question.question_text"
+          ></article>
 
           <div v-if="question.question_audio?.url" class="mb-6 p-4 bg-slate-50 rounded-xl">
             <p class="text-xs font-bold text-slate-500 mb-2 uppercase">Audio Pendukung:</p>
@@ -60,12 +66,19 @@
       </div>
 
       <div class="space-y-6">
-        <div class="bg-blue-600 p-6 rounded-2xl text-white shadow-lg shadow-blue-200">
+        <div class="bg-blue-50 p-6 rounded-2xl text-white shadow-lg shadow-blue-200">
           <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
             <span>💡</span> Pembahasan
           </h3>
-          <p class="text-blue-50 leading-relaxed text-sm mb-6">{{ question.discussion_text }}</p>
-          
+                    
+          <article 
+            class="prose prose-slate dark:prose-invert max-w-none 
+                  prose-headings:text-slate-800 dark:prose-headings:text-white
+                  prose-p:text-slate-900 dark:prose-p:text-slate-800
+                  prose-p:leading-relaxed"
+            v-html="question.discussion_text"
+          ></article>
+
           <div v-if="question.discussion_video?.url">
             <p class="text-xs font-bold text-blue-200 mb-2 uppercase tracking-widest">Video Pembahasan:</p>
             <a :href="question.discussion_video?.url" target="_blank" class="block p-3 bg-white/10 hover:bg-white/20 rounded-xl text-center border border-white/20 transition-all">

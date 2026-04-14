@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { ICategory, MediaObject } from '~/types/categories'
 import ImageUpload from '~/components/shared/ImageUpload.vue'
+import RichEditor from '~/components/shared/RichEditor.vue';
+
+
 
 type CreateCategoryForm = {
   name: string
@@ -197,26 +200,34 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
   
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label :class="labelClass">Main Description</label>
-              <textarea 
-                v-model="form.description" 
-                rows="3" 
-                :class="inputClass" 
-                placeholder="Brief summary about this category..."
-              ></textarea>
-            </div>
-            <div>
-              <label :class="labelClass">Sub Description</label>
-              <textarea 
-                v-model="form.sub_description" 
-                rows="3" 
-                :class="inputClass" 
-                placeholder="Additional details for display..."
-              ></textarea>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label :class="labelClass">Main Description</label>
+            <!-- <textarea v-model="form.description" rows="3" :class="inputClass"></textarea> -->
+                         
+            <ClientOnly>
+              <RichEditor v-model="form.description" />
+              <template #fallback>
+                <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                  <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                </div>
+              </template>
+            </ClientOnly>
           </div>
+          <div>
+            <label :class="labelClass">Sub Description</label>
+            <!-- <textarea v-model="form.sub_description" rows="3" :class="inputClass"></textarea> -->
+                           
+            <ClientOnly>
+                <RichEditor v-model="form.sub_description" />
+                <template #fallback>
+                  <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                    <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                  </div>
+                </template>
+              </ClientOnly>
+          </div>
+        </div>
 
         </div>
       </div>

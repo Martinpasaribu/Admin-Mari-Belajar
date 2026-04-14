@@ -5,6 +5,9 @@ import ImageUpload from '~/components/shared/ImageUpload.vue'
 // Pastikan path import sesuai dengan folder komponen Anda
 import VideoPicker from '~/components/shared/VideoPicker.vue'
 import DocumentPicker from '~/components/shared/DocumentPicker.vue'
+import RichEditor from '~/components/shared/RichEditor.vue';
+
+
 
 type CreateBabForm = {
   name: string
@@ -178,24 +181,51 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
 
           <div>
             <label :class="labelClass">Isi Materi (Teks)</label>
-            <textarea 
+            <!-- <textarea 
               v-model="form.content" 
               rows="6" 
               :class="inputClass" 
               placeholder="Tuliskan isi materi dalam bentuk teks di sini..."
-            ></textarea>
+            ></textarea> -->
+            <ClientOnly>
+              <RichEditor v-model="form.content" />
+              <template #fallback>
+                <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                  <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                </div>
+              </template>
+            </ClientOnly>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label :class="labelClass">Ringkasan (Description)</label>
-              <textarea v-model="form.description" rows="3" :class="inputClass"></textarea>
-            </div>
-            <div>
-              <label :class="labelClass">Info Tambahan (Sub Description)</label>
-              <textarea v-model="form.sub_description" rows="3" :class="inputClass"></textarea>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label :class="labelClass">Main Description</label>
+            <!-- <textarea v-model="form.description" rows="3" :class="inputClass"></textarea> -->
+                         
+            <ClientOnly>
+              <RichEditor v-model="form.description" />
+              <template #fallback>
+                <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                  <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                </div>
+              </template>
+            </ClientOnly>
           </div>
+          <div>
+            <label :class="labelClass">Sub Description</label>
+            <!-- <textarea v-model="form.sub_description" rows="3" :class="inputClass"></textarea> -->
+                           
+            <ClientOnly>
+                <RichEditor v-model="form.sub_description" />
+                <template #fallback>
+                  <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                    <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                  </div>
+                </template>
+              </ClientOnly>
+          </div>
+        </div>
+
         </div>
       </div>
 
@@ -245,6 +275,7 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
                 </div>
               </div>
             </div>
+            
           </div>
 
           <div class="grid grid-cols-2 gap-4">

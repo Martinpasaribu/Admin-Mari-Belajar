@@ -12,7 +12,7 @@ export interface MediaObject {
 }
 
 export interface IBab {
-  _id: string;          // ID dari MongoDB
+  _id: string | '';          // ID dari MongoDB
   id: string;           // Virtual ID (biasanya hasil toJSON)
   sub_category_key: ICategory; // Referensi ke Category (ObjectId sebagai string)
   name: string;

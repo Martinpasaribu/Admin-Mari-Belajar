@@ -38,6 +38,8 @@ onMounted(() => {
     if (e.key === 'Escape' && props.show) emit('close');
   });
 });
+
+
 </script>
 
 <template>

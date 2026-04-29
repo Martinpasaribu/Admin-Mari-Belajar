@@ -8,6 +8,8 @@ type CreateCategoryForm = {
   name: string
   description: string
   sub_description: string
+  description_base: string
+  sub_description_base: string
   order: number
   isActive: boolean
   icon: any | null 
@@ -20,10 +22,20 @@ const emit = defineEmits(['close', 'success'])
 
 const isSubmitting = ref(false)
 const form = ref<CreateCategoryForm>({
-  name: '', description: '', sub_description: '',
+  name: '', description: '', sub_description: '', sub_description_base:'', description_base:'',
   order: 0, isActive: true,
   icon: null, image_bg: null, images: []
 })
+
+const { syncPlainText } = useTextStripper();
+
+
+// Daftarkan field yang mau dipantau secara otomatis
+syncPlainText(form, [
+  { htmlField: 'description', baseField: 'description_base' },
+  { htmlField: 'sub_description', baseField: 'sub_description_base' }
+]);
+
 
 // PERBAIKAN: Fungsi Helper Upload
 const performUpload = async (file: File | File[] | null, endpoint: 'upload-single' | 'upload-multiple') => {
@@ -113,7 +125,8 @@ const resetForm = () => {
   form.value = {
     name: '', description: '', sub_description: '',
     order: 0, isActive: true,
-    icon: null, image_bg: null, images: []
+    icon: null, image_bg: null, images: [],
+    description_base: '', sub_description_base: ''
   }
 }
 
@@ -190,7 +203,7 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
               ></textarea> -->
                           
               <ClientOnly>
-                <RichEditor v-model="form.description" />
+                <RichEditor v-model="form.sub_description" />
                 <template #fallback>
                   <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
                     <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>

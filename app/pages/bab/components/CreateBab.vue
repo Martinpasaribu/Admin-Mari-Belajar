@@ -6,15 +6,21 @@ import ImageUpload from '~/components/shared/ImageUpload.vue'
 import VideoPicker from '~/components/shared/VideoPicker.vue'
 import DocumentPicker from '~/components/shared/DocumentPicker.vue'
 import RichEditor from '~/components/shared/RichEditor.vue';
-
+import { 
+  Plus, Trash2, HelpCircle, Video, Music, 
+  Image as ImageIcon, Type, FileText 
+} from 'lucide-vue-next';
 
 
 type CreateBabForm = {
   name: string
   description: string
-  sub_category_key: string | null
   sub_description: string
   content: string
+  description_base: string
+  sub_category_key: string | null
+  sub_description_base: string
+  content_base: string
   isFree?: boolean
   order: number
   duration: number
@@ -23,8 +29,12 @@ type CreateBabForm = {
   image_bg: any | null
   images: any[]
   video_url: any
+  section: any[]
   document: any
+  
 }
+
+const { syncPlainText } = useTextStripper();
 
 const props = defineProps<{ 
   show: boolean,
@@ -36,11 +46,19 @@ const isSubmitting = ref(false)
 
 const form = ref<CreateBabForm>({
   name: '', description: '', sub_description: '', content: '',
-  order: 0, isActive: true, duration: 0,
+  order: 0, isActive: true, duration: 0, section: [],
   icon: null, image_bg: null, images: [], document: null, video_url: null,
   sub_category_key: props.subcategory?._id || null,
-  isFree: true,
+  isFree: true,  sub_description_base: '', 
+  description_base: '', content_base: '',
 })
+
+// Daftarkan field yang mau dipantau secara otomatis
+syncPlainText(form, [
+  { htmlField: 'description', baseField: 'description_base' },
+  { htmlField: 'sub_description', baseField: 'sub_description_base' },
+  { htmlField: 'content', baseField: 'content_base' }
+]);
 
 // Sinkronisasi sub_category_key jika props berubah
 watch(() => props.subcategory, (newVal) => {
@@ -128,11 +146,25 @@ const handleAdd = async () => {
 
 const resetForm = () => {
   form.value = {
-    name: '', description: '', sub_description: '', content:'',
+    name: '', description: '', sub_description: '', content:'', section: [],
     order: 0, isActive: true, sub_category_key: props.subcategory?._id || null,
     icon: null, image_bg: null, images: [], video_url: null, document: null,
-    isFree: true, duration: 0
+    isFree: true, duration: 0,   sub_description_base: '', 
+    description_base: '', content_base: '',
   }
+}
+
+const addSection = () => {
+  const nextLabel = String.fromCharCode(65 + form.value.section.length) // A, B, C...
+  form.value.section.push({ label: nextLabel, text: '', image: null })
+}
+
+const removeSection = (index: number) => {
+  form.value.section.splice(index, 1)
+  // Re-label options
+  form.value.section.forEach((opt: { label: string; }, i: number) => {
+    opt.label = String.fromCharCode(65 + i)
+  })
 }
 
 const labelClass = "block text-[13px] font-semibold text-slate-700 mb-1.5 ml-0.5 tracking-tight"
@@ -297,6 +329,42 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
           </div>
 
         </div>
+      </div>
+
+
+      <div class="mb-4">
+        <h3 class="text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em] mb-4">Pengaturan & Kuis</h3>
+
+        <!-- Menambahakan Section -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b pb-2">
+            <div class="flex items-center gap-2">
+              <FileText class="w-5 h-5 text-emerald-500" />
+              <h3 class="font-bold text-slate-700">Pilihan Section</h3>
+            </div>
+            <button @click="addSection" class="text-xs bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 hover:bg-emerald-100">
+              <Plus class="w-3 h-3" /> Tambah Section
+            </button>
+          </div>
+
+          <div class="space-y-3 max-h-[450px] overflow-y-auto pr-2 custom-scrollbar">
+            <div v-for="(opt, index) in form.section" :key="index" class="flex gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 items-start">
+              <div class="bg-blue-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold shrink-0">
+                {{ opt.label }}
+              </div>
+              
+              <div class="flex-1 space-y-3">
+                <input v-model="opt.name" type="text" :class="inputClass" placeholder="Pemahaman AI" />
+              </div>
+
+              <button @click="removeSection(index)" class="p-2 text-slate-400 hover:text-red-500">
+                <Trash2 class="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+        </div>
+
       </div>
 
 

@@ -105,7 +105,7 @@ const addQuestion = (item: IBab) => {
         { key: 'name', label: 'Nama Bab' }, 
         { key: 'slug', label: 'Slug / URL' },
         { key: 'question_keys.length', label: 'Soal' },
-        { key: 'sub_description', label: 'Description' },
+        // { key: 'sub_description', label: 'Description' },
         { key: 'sub_category_key.name', label: 'SubCategory' }
       ]"
       :items="categories"

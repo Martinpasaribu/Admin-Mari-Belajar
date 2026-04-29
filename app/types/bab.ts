@@ -20,7 +20,7 @@ export interface IBab {
   description?: string;
   sub_description?: string;
   content?: string;
-
+  section: any;
 
   isFree : boolean;
   price : number;

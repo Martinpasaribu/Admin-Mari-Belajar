@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { 
   Plus, Trash2, HelpCircle, Video, Music, 
-  Image as ImageIcon, Type, FileText 
+  Image as ImageIcon, Type, FileText, 
+  Section
 } from 'lucide-vue-next';
 import ImageUpload from '~/components/shared/ImageUpload.vue';
 import VideoPicker from '~/components/shared/VideoPicker.vue';
@@ -12,7 +13,7 @@ import RichEditor from '~/components/shared/RichEditor.vue';
 
 const props = defineProps<{
    show: boolean
-   bab: IBab | null | {},
+   bab: IBab | null,
 }>()
 
 const emit = defineEmits(['close', 'success'])
@@ -34,23 +35,37 @@ const getInitialForm = () => ({
   ],
   correct_answer: '',
   discussion_text: '',
+  section: {},
   discussion_video: null,
   order: 0,
-  isActive: true
+  isActive: true,
+  question_text_base: '',
+  discussion_text_base: '',
 })
 
 const form = ref<any>(getInitialForm())
 
 
+const { syncPlainText } = useTextStripper();
+
+
+// Daftarkan field yang mau dipantau secara otomatis
+syncPlainText(form, [
+  { htmlField: 'question_text', baseField: 'question_text_base' },
+  { htmlField: 'discussion_text', baseField: 'discussion_text_base' }
+]);
+
+
+// Update Watcher untuk Reset Form yang lebih aman
 watch(() => props.show, (newVal) => {
   if (newVal) {
-    // Pastikan bab_key terisi jika props.bab berubah
-    form.value.bab_key = props.bab?._id || "";
+    form.value.bab_key = (props.bab as any)?._id || "";
   } else {
-    // Opsional: Reset form saat modal ditutup agar bersih saat dibuka lagi
-    form.value = getInitialForm();
+    // Reset nilai tanpa mengganti referensi objek total agar watcher syncPlainText tidak putus
+    Object.assign(form.value, getInitialForm());
   }
 })
+
 
 const addOption = () => {
   const nextLabel = String.fromCharCode(65 + form.value.options.length) // A, B, C...
@@ -118,6 +133,8 @@ const handleSave = async () => {
       emit('success')
       form.value = getInitialForm()
       // emit('close')
+    } else {
+      alert(res?.message || 'Gagal update')
     }
   } catch (err: any) {
     alert('Gagal simpan soal: ' + (err.data?.message || err.message))
@@ -156,7 +173,7 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
 <template>
   <GenericModal 
     :show="show"
-    :id="`Bab : ${bab?.name} `" 
+    :id="`Bab : ${bab?.name!} `" 
     title="Tambah Soal Baru" 
     @close="emit('close')" 
     @confirm="handleSave" 
@@ -164,8 +181,35 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
     size="full"
   >
     <div class="max-h-[75vh] overflow-y-auto px-1 custom-scrollbar">
+      
+      
+      <div class="mb-2">
+        <label :class="labelClass">Select Section Bab</label>
+        <select 
+          v-model="form.section" 
+          :class="inputClass"
+          :disabled="isSubmitting"
+        >
+          <option :value="null" disabled>{{ isSubmitting ? 'Loading...' : 'Choose section bab' }}</option>
+          <option v-for="sec in bab?.section" :key="sec._id" :value="sec">
+            {{ sec.name }}
+          </option>
+        </select>
+      </div>
+
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
+        <!-- <div>
+          <label :class="labelClass">Tipe Soal</label>
+          <select v-model="bab?.section" :class="inputClass">
+            <option value="multiple_choice">Pilihan Ganda</option>
+            <option value="image_options">Pilihan Gambar</option>
+            <option value="essay">Essay / Isian</option>
+          </select>
+        </div> -->
+
+
         <div class="lg:col-span-7 space-y-8">
           
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-5 rounded-2xl border border-slate-100">

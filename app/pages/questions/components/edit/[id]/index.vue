@@ -22,16 +22,40 @@
 
     <div v-else class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div class="lg:col-span-2 space-y-6">
+
+        <div class="text-slate-400 capitalize p-2">{{ form.code }}</div>
+
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-6">
           
+          <div v-if="bab?.section?.length > 0" class="mb-2">
+            <label :class="labelClass">Select Section Bab</label>
+            <select v-model="form.section" :class="inputClass">
+              <option :value="null">Choose section bab</option>
+              <option v-for="sec in bab.section" :key="sec._id" :value="sec">
+                {{ sec.name }}
+              </option>
+            </select>
+          </div>
+
+
           <div>
             <label class="block text-sm font-bold text-slate-700 mb-2">Isi Pertanyaan</label>
-            <textarea 
+            <!-- <textarea 
               v-model="form.question_text"
               rows="4"
               class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               placeholder="Tuliskan soal di sini..."
-            ></textarea>
+            ></textarea> -->
+
+            <ClientOnly>
+              <RichEditor v-model="form.question_text" />
+              <template #fallback>
+                <div class="h-[250px] w-full bg-slate-50 rounded-2xl border border-dashed border-slate-200 flex items-center justify-center">
+                  <span class="text-xs text-slate-400 font-medium">Memuat Editor...</span>
+                </div>
+              </template>
+            </ClientOnly>
+
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -134,10 +158,9 @@ definePageMeta({ layout: 'admin' });
 const route = useRoute();
 const questionId = route.params.id;
 const isUpdating = ref(false);
-
+const bab = ref<any>()
 // State Form (Default structure)
 const form = ref<any>({
-  question_text: '',
   type: 'multiple_choice',
   order: 0,
   options: [
@@ -148,22 +171,48 @@ const form = ref<any>({
     { label: 'E', text: '', image: { url: '' } },
   ],
   correct_answer: '',
+  question_text: '',
+  question_text_base: '',
   discussion_text: '',
+  discussion_text_base: '',
   discussion_video: null,
-  isActive: true
+  isActive: true,
+  section: null
 });
 
-// 1. Fetch Data Awal
-const { data, pending } = await useFetch<IQuestion>(`http://localhost:5002/api/v1/questions/${questionId}`);
+const { syncPlainText } = useTextStripper();
+
+// Daftarkan field yang mau dipantau secara otomatis
+syncPlainText(form, [
+  { htmlField: 'question_text', baseField: 'question_text_base' },
+  { htmlField: 'discussion_text', baseField: 'discussion_text_base' }
+]);
+
+// 1. Fetch Data Awal Penting aturan respone
+const { data, pending } = await useFetch<any>(`http://localhost:5002/api/v1/questions/${questionId}`);
 
 // 2. Masukkan data ke form saat data berhasil diload
 watchEffect(() => {
   if (data.value) {
+    // 1. Map data ke form
+
+    // 2. Simpan data bab
+    bab.value = data.value.bab_key;
+
     form.value = { 
       ...data.value,
-      // Pastikan nested objects tidak undefined
-      discussion_video: data.value.discussion_video || { url: '' }
+      discussion_video: data.value.discussion_video || { url: '' },
+      question_images: data.value.question_images || []
     };
+
+    console.log("data ", JSON.stringify(data.value));
+
+    // 3. Gunakan optional chaining untuk logging agar tidak error jika null
+    if (bab.value?.section) {
+      console.log("Sections found:", JSON.stringify(bab.value.section));
+    } else {
+      console.log("Bab atau Section belum dimuat");
+    }
   }
 });
 
@@ -224,6 +273,8 @@ const handleUpdate = async () => {
 
     const payload = {
       ...form.value,
+      bab_key: form.value.bab_key?._id || form.value.bab_key, 
+      section: form.value.section?._id ? form.value.section : form.value.section,
       question_audio: audio || null,
       question_images: images || [],
       discussion_video: cleanVideo, // Kirim null jika data tidak lengkap
@@ -245,4 +296,9 @@ const handleUpdate = async () => {
     isUpdating.value = false;
   }
 };
+
+
+const labelClass = "block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-widest"
+const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
+
 </script>

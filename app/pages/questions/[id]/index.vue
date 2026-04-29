@@ -19,9 +19,14 @@
     <div v-else-if="question" class="grid grid-cols-1 lg:grid-cols-3 gap-8">     
       <div class="lg:col-span-2 space-y-6">
         <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg font-mono font-bold">#{{ question.order }}</span>
-            <span class="text-slate-400 capitalize">{{ question.type.replace('_', ' ') }}</span>
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <span class="bg-slate-100 text-slate-600 px-3 py-1 rounded-lg font-mono font-bold">#{{ question.order }}</span>
+              <span class="text-slate-400 capitalize">{{ question.type.replace('_', ' ') }}</span>
+
+            </div>
+
+            <span class="text-slate-400 capitalize">{{ question.code }}</span>
           </div>
 
           <article 
@@ -114,7 +119,7 @@ const route = useRoute();
 const questionId = route.params.id;
 
 // Fetch detail question menggunakan ID dari URL
-const { data: question, pending } = await useFetch<IQuestion>(`http://localhost:5002/api/v1/questions/${questionId}`);
+const { data: question, pending } = await useFetch<any>(`http://localhost:5002/api/v1/questions/${questionId}`);
 
 const goToEdit = () => {
   // Arahkan ke halaman edit jika ada

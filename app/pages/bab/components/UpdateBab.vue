@@ -1,5 +1,7 @@
+
 <script setup lang="ts">
-import { Layout, FileText, Video, FileArchive } from 'lucide-vue-next';
+
+import { Layout, FileText, Video, FileArchive, Plus, Trash2} from 'lucide-vue-next';
 import ImageUpload from '~/components/shared/ImageUpload.vue';
 import VideoPicker from '~/components/shared/VideoPicker.vue';
 import DocumentPicker from '~/components/shared/DocumentPicker.vue';
@@ -27,6 +29,7 @@ const form = ref<any>({
   order: 0,
   duration: 0,
   isActive: true,
+  section: [],
   isFree: true,
   icon: null,
   image_bg: null,
@@ -146,6 +149,27 @@ const handleUpdate = async () => {
     isSubmitting.value = false
   }
 }
+
+// Fungsi untuk menambah section baru
+const addSection = () => {
+  const nextLabel = String.fromCharCode(65 + (form.value.section?.length || 0)); // A, B, C...
+  if (!form.value.section) form.value.section = [];
+  
+  form.value.section.push({
+    label: nextLabel,
+    name: '',
+    // Properti 'code' akan di-generate otomatis oleh backend/generator Anda
+  });
+};
+
+// Fungsi untuk menghapus section
+const removeSection = (index: number) => {
+  form.value.section.splice(index, 1);
+  // Re-order label A, B, C jika diperlukan
+  form.value.section.forEach((sec: any, i: number) => {
+    sec.label = String.fromCharCode(65 + i);
+  });
+};
 
 const labelClass = "block text-[11px] font-bold text-slate-500 mb-1.5 ml-0.5 uppercase tracking-widest"
 const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-xl text-slate-900 text-sm transition-all focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none"
@@ -286,6 +310,61 @@ const inputClass = "w-full bg-white px-4 py-2.5 border border-slate-200 rounded-
               <span class="text-[9px] font-black text-slate-400 uppercase">Gratis</span>
               <input v-model="form.isFree" type="checkbox" class="w-5 h-5 accent-emerald-500" />
             </div>
+          </div>
+        </div>
+     
+        <div class="pt-6 border-t border-slate-100 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <Layout class="w-4 h-4 text-blue-500" />
+              <h3 class="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                Daftar Section (Bagian)
+              </h3>
+            </div>
+            <button 
+              type="button"
+              @click="addSection" 
+              class="text-[10px] font-bold bg-blue-50 text-blue-600 px-3 py-1 rounded-lg hover:bg-blue-100 transition-colors flex items-center gap-1"
+            >
+              <Plus :size="12" /> Tambah Section
+            </button>
+          </div>
+
+          <div v-if="form.section && form.section.length > 0" class="space-y-3">
+            <div 
+              v-for="(sec, index) in form.section" 
+              :key="index"
+              class="flex items-center gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100 group"
+            >
+              <div class="w-8 h-8 shrink-0 bg-white border border-slate-200 rounded-lg flex items-center justify-center text-xs font-black text-blue-600 shadow-sm">
+                {{ sec.label }}
+              </div>
+
+              <div class="flex-1">
+                <input 
+                  v-model="sec.name" 
+                  type="text" 
+                  placeholder="Contoh: Reading, Listening, atau Grammar"
+                  class="w-full bg-transparent border-none focus:ring-0 text-sm font-medium text-slate-700 placeholder:text-slate-300"
+                />
+              </div>
+
+              <div v-if="sec.code" class="px-2 py-1 bg-slate-200 rounded-md text-[9px] font-bold text-slate-500 uppercase">
+                Code: {{ sec.code }}
+              </div>
+
+              <button 
+                type="button"
+                @click="removeSection(index)"
+                class="p-2 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+              >
+                <Trash2 :size="16" />
+              </button>
+            </div>
+          </div>
+
+          <div v-else class="text-center py-8 border-2 border-dashed border-slate-100 rounded-2xl">
+            <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Belum ada section ditambahkan</p>
           </div>
         </div>
 

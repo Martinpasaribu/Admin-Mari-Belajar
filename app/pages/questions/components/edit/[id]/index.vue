@@ -189,7 +189,7 @@ syncPlainText(form, [
 ]);
 
 // 1. Fetch Data Awal Penting aturan respone
-const { data, pending } = await useFetch<any>(`http://localhost:5002/api/v1/questions/${questionId}`);
+const { data, pending } = await useFetch<any>(`${Base_url}/questions/${questionId}`);
 
 // 2. Masukkan data ke form saat data berhasil diload
 watchEffect(() => {
@@ -281,7 +281,7 @@ const handleUpdate = async () => {
       options: form.value.type === 'essay' ? [] : processedOptions
     }
 
-    await $fetch(`http://localhost:5002/api/v1/questions/${questionId}`, {
+    await $fetch(`${Base_url}/questions/${questionId}`, {
       method: 'PUT',
       body: payload
     });

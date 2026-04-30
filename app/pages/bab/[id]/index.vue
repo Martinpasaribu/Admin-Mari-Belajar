@@ -103,11 +103,11 @@ const subcategoryId = route.params.id;
 const bab = ref<IBab[]>([]);
 const isLoading = ref(false);
 // Fetch detail question menggunakan ID dari URL
-const { data: question, pending } = await useFetch<IQuestion>(`http://localhost:5002/api/v1/questions/${questionId}`);
+const { data: question, pending } = await useFetch<IQuestion>(`${Base_url}/questions`);
 
 const goToEdit = () => {
   // Arahkan ke halaman edit jika ada
-  navigateTo(`/questions/components/edit/${questionId}`);
+  navigateTo(`/questions/components/edit`);
 };
 
 const fetchBab = async () => {
@@ -123,7 +123,7 @@ const fetchBab = async () => {
       // Gunakan ID langsung dari computed babIdFromQuery
       const subCategoryId = subcategoryId;
 
-      res = await $fetch<IQuestion[]>(`http://localhost:5002/api/v1/bab/admin/${subCategoryId}`, {
+      res = await $fetch<IQuestion[]>(`${Base_url}/bab/admin/${subCategoryId}`, {
         method: 'GET'
       });
     }

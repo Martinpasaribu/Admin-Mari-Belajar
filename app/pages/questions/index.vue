@@ -159,7 +159,7 @@ const viewAll = () => {
     <DeletedModal
       v-if="showDelete"
       :show="showDelete" 
-      :endpoint="`http://localhost:5002/api/v1/questions/${activeItem?._id}`"
+      :endpoint="`${Base_url}/questions/${activeItem?._id}`"
       :message="`Hapus soal nomor ${activeItem?.order}? Tindakan ini tidak dapat dibatalkan.`"
       @close="showDelete = false" 
       @success="fetchQuestions" 

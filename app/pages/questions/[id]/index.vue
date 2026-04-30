@@ -119,7 +119,7 @@ const route = useRoute();
 const questionId = route.params.id;
 
 // Fetch detail question menggunakan ID dari URL
-const { data: question, pending } = await useFetch<any>(`http://localhost:5002/api/v1/questions/${questionId}`);
+const { data: question, pending } = await useFetch<any>(`${Base_url}/questions/${questionId}`);
 
 const goToEdit = () => {
   // Arahkan ke halaman edit jika ada
